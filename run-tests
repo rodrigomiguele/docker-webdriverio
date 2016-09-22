@@ -5,4 +5,22 @@ rm -rf $ERRORSHOTS/*
 
 java -Djava.util.logging.config.file=/opt/logging.properties -jar /opt/selenium-server.jar &
 
+function wait_for_server() {
+    MAX_WAIT=60
+    STARTED_AT="$(date +%s)"
+    until `curl localhost:4444 2> /dev/null | grep -q Jetty`; do
+        sleep 1
+        NOW="$(date +%s)"
+        TIME_UNTIL_NOW=`expr $NOW - $STARTED_AT`
+        if [ $TIME_UNTIL_NOW -gt $MAX_WAIT ]; then
+            echo "ERROR! The server didn't started after $MAX_WAIT. Shutting down..."
+            shutdown_jboss
+            exit 1
+        fi
+    done
+    echo "Selenium Server started after $TIME_UNTIL_NOW second(s)"
+}
+
+wait_for_server
+
 wdio /home/developer/app/wdio.conf.js
