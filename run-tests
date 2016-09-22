@@ -1,0 +1,8 @@
+#!/bin/bash
+
+rm -rf $OUTPUTDIR/*
+rm -rf $ERRORSHOTS/*
+
+java -Djava.util.logging.config.file=/opt/logging.properties -jar /opt/selenium-server.jar &
+
+wdio /home/developer/app/wdio.conf.js
